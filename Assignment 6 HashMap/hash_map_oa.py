@@ -1,9 +1,9 @@
-# Name:
-# OSU Email:
+# Name: Ryan Gallagher
+# OSU Email: gallagry@oregonstate.edu
 # Course: CS261 - Data Structures
-# Assignment:
-# Due Date:
-# Description:
+# Assignment: Assignment 6
+# Due Date: March 11
+# Description: HashMap Implementation
 
 
 from a6_include import *
