@@ -59,16 +59,28 @@ class HashMap:
         return out
 
     def clear(self) -> None:
-        """
-        TODO: Write this implementation
-        """
-        pass
+        """Clears the contents of the hash map table."""
+        total_buckets = self.capacity
+        index = 0
+        while index < total_buckets:
+            bucket = self.buckets.get_at_index(index)
+            if bucket.length() == 0:
+                bucket = LinkedList()
+            index += 1
+        self.size = 0
 
     def get(self, key: str) -> object:
-        """
-        TODO: Write this implementation
-        """
-        pass
+        """Returns the value with the associated given key, if the key is in the hash map."""
+        hashed_index = self.hash_function(key) % self.capacity
+        chain = self.buckets.get_at_index(hashed_index)
+        index = 0
+        while index < self.capacity:
+            if chain.contains(key) is not None:
+                current_node = chain.contains(key)
+                return current_node.value
+            else:
+                index += 1
+        return None
 
     def put(self, key: str, value: object) -> None:
         """Class method to update a given key's value. If the key is not in the map, it is added."""
@@ -76,36 +88,40 @@ class HashMap:
         chain = self.buckets.get_at_index(hashed_index)
         if chain.contains(key) is not None:
             current_node = chain.contains(key)
-            current_node.value(value)
+            current_node.value = value
         else:
             chain.insert(key, value)
-
-        # update or add key value to hashmap
-        # update size
-        # update size
-        # update table load
-        # update capacity
-        # resize if needed
-        pass
+            self.size += 1
 
     def remove(self, key: str) -> None:
-        """
-        TODO: Write this implementation
-        """
-        pass
+        """Class method to remove a provided key from a hash map."""
+        hashed_index = self.hash_function(key) % self.capacity
+        chain = self.buckets.get_at_index(hashed_index)
+        index = 0
+        while index < self.capacity:
+            if chain.contains(key) is not None:
+                chain.remove(key)
+                return
+            else:
+                index += 1
 
     def contains_key(self, key: str) -> bool:
-        """
-        TODO: Write this implementation
-        """
-        pass
+        """Returns true if the key is in the hash map, or false if it does not."""
+        hashed_index = self.hash_function(key) % self.capacity
+        chain = self.buckets.get_at_index(hashed_index)
+        index = 0
+        while index < self.capacity:
+            if chain.contains(key) is not None:
+                return True
+            else:
+                index += 1
+        return False
 
     def empty_buckets(self) -> int:
         """Returns the total number of empty buckets in the hash table."""
-        total_buckets = self.capacity
         index = 0
         empty_count = 0
-        while index < total_buckets:
+        while index < self.capacity:
             bucket = self.buckets.get_at_index(index)
             if bucket.length() == 0:
                 empty_count += 1
@@ -114,18 +130,21 @@ class HashMap:
 
     def table_load(self) -> float:
         """Calculates and returns the current hash table load factor."""
-        empty_buckets = self.empty_buckets()
-        filled_buckets = self.capacity - empty_buckets
-        load_factor = filled_buckets / self.capacity
+        load_factor = self.size / self.capacity
         return load_factor
 
     def resize_table(self, new_capacity: int) -> None:
         """Resizes the internal hash table size and rehashes all existing links are rehashed."""
         if new_capacity < 1:
             return
-        if new_capacity <= self.size:
-            return
-        # update internal has table
+        temp = HashMap(new_capacity, self.hash_function)   # temporarily hold previous values
+        index = 0
+        while index < self.capacity:
+            bucket = self.buckets.get_at_index(index)
+            if bucket.length() != 0:
+                temp.buckets
+
+        # update internal hash table
         # rehash all has table links
         # update load factor
 
@@ -203,14 +222,14 @@ if __name__ == "__main__":
     # m.clear()
     # print(m.size, m.capacity)
 
-    print("\nPDF - put example 1")
-    print("-------------------")
-    m = HashMap(50, hash_function_1)
-    for i in range(150):
-        m.put('str' + str(i), i * 100)
-        if i % 25 == 24:
-            print(m.empty_buckets(), m.table_load(), m.size, m.capacity)
-
+    # print("\nPDF - put example 1")
+    # print("-------------------")
+    # m = HashMap(50, hash_function_1)
+    # for i in range(150):
+    #     m.put('str' + str(i), i * 100)
+    #     if i % 25 == 24:
+    #         print(m.empty_buckets(), m.table_load(), m.size, m.capacity)
+    #
     # print("\nPDF - put example 2")
     # print("-------------------")
     # m = HashMap(40, hash_function_2)
@@ -275,33 +294,33 @@ if __name__ == "__main__":
     # print(m.get('key1'))
     # m.remove('key4')
     #
-    # print("\nPDF - resize example 1")
-    # print("----------------------")
-    # m = HashMap(20, hash_function_1)
-    # m.put('key1', 10)
-    # print(m.size, m.capacity, m.get('key1'), m.contains_key('key1'))
-    # m.resize_table(30)
-    # print(m.size, m.capacity, m.get('key1'), m.contains_key('key1'))
-    #
-    # print("\nPDF - resize example 2")
-    # print("----------------------")
-    # m = HashMap(75, hash_function_2)
-    # keys = [i for i in range(1, 1000, 13)]
-    # for key in keys:
-    #     m.put(str(key), key * 42)
-    # print(m.size, m.capacity)
-    #
-    # for capacity in range(111, 1000, 117):
-    #     m.resize_table(capacity)
-    #
-    #     m.put('some key', 'some value')
-    #     result = m.contains_key('some key')
-    #     m.remove('some key')
-    #
-    #     for key in keys:
-    #         result &= m.contains_key(str(key))
-    #         result &= not m.contains_key(str(key + 1))
-    #     print(capacity, result, m.size, m.capacity, round(m.table_load(), 2))
+    print("\nPDF - resize example 1")
+    print("----------------------")
+    m = HashMap(20, hash_function_1)
+    m.put('key1', 10)
+    print(m.size, m.capacity, m.get('key1'), m.contains_key('key1'))
+    m.resize_table(30)
+    print(m.size, m.capacity, m.get('key1'), m.contains_key('key1'))
+
+    print("\nPDF - resize example 2")
+    print("----------------------")
+    m = HashMap(75, hash_function_2)
+    keys = [i for i in range(1, 1000, 13)]
+    for key in keys:
+        m.put(str(key), key * 42)
+    print(m.size, m.capacity)
+
+    for capacity in range(111, 1000, 117):
+        m.resize_table(capacity)
+
+        m.put('some key', 'some value')
+        result = m.contains_key('some key')
+        m.remove('some key')
+
+        for key in keys:
+            result &= m.contains_key(str(key))
+            result &= not m.contains_key(str(key + 1))
+        print(capacity, result, m.size, m.capacity, round(m.table_load(), 2))
     #
     # print("\nPDF - get_keys example 1")
     # print("------------------------")
