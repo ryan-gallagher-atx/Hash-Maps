@@ -80,10 +80,9 @@ class HashMap:
         return out
 
     def clear(self) -> None:
-        """
-        TODO: Write this implementation
-        """
-        pass
+        """Clears the hashmap."""
+        temp = HashMap(self.capacity, self.hash_function)
+        self.buckets = temp.buckets
 
     def get(self, key: str) -> object:
         """
