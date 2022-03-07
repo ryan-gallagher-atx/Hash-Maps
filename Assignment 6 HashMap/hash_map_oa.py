@@ -83,20 +83,34 @@ class HashMap:
         """Clears the hashmap."""
         temp = HashMap(self.capacity, self.hash_function)
         self.buckets = temp.buckets
+        self.size = 0
 
     def get(self, key: str) -> object:
-        """
-        TODO: Write this implementation
-        """
+        """Determines if a key is in the hashmap, and if so, returns the value. If not, returns None."""
+        if self.buckets.length() <= 0:
+            return None
+        hashed_index = self.hash_function(key) % self.capacity
+        result = self.get_quadratic_probe(hashed_index, key)
+        return result
         # quadratic probing required
-        pass
+
+    def get_quadratic_probe(self, initial_index, key) -> int or None:
+        """Quadratically probes the hashmap for the key."""
+        j = 1
+        index = (initial_index + j ** 2) % self.capacity
+        while self.buckets.get_at_index(index) is not None:
+            if self.buckets.get_at_index(index).key == key:
+                return self.buckets.get_at_index(index).value
+            j += 1
+            index = (initial_index + j ** 2) % self.capacity
+        return None
 
     def put(self, key: str, value: object) -> None:
         """Adds a key value pair to the hash map. If the key already exists, it overwrites the value."""
         if self.table_load() >= 0.5:   # resize check, if needed
             self.resize_table(self.capacity * 2)
         hashed_index = self.hash_function(key) % self.capacity
-        hashed_index = self.quadratic_probe(hashed_index)
+        hashed_index = self.put_quadratic_probe(hashed_index, key)
         item = HashEntry(key, value)
         self.buckets.set_at_index(hashed_index, item)
         self.size += 1
@@ -105,7 +119,18 @@ class HashMap:
         # resize the table before putting the new key/value pair
         #
         # quadratic probing required
-        pass
+
+    def put_quadratic_probe(self, initial_index, key) -> int:
+        """Quadratically probes the Dynamic Array as a helper method."""
+        j = 1
+        index = (initial_index + j ** 2) % self.capacity
+        while self.buckets.get_at_index(index) is not None:
+            if self.buckets.get_at_index(index).key == key:
+                self.size -= 1
+                return index
+            j += 1
+            index = (initial_index + j ** 2) % self.capacity
+        return index
 
     def remove(self, key: str) -> None:
         """
@@ -114,12 +139,25 @@ class HashMap:
         # quadratic probing required
         pass
 
-    def contains_key(self, key: str) -> bool:
-        """
-        TODO: Write this implementation
-        """
+    def contains_key(self, key: str) -> bool:   # retest after remove is implemented
+        """Determines if the hashmap contains a key, and returns True if found or False if not."""
+        if self.buckets.length() <= 0:
+            return False
+        hashed_index = self.hash_function(key) % self.capacity
+        result = self.contains_key_quadratic_probe(hashed_index, key)
+        return result
         # quadratic probing required
-        pass
+
+    def contains_key_quadratic_probe(self, initial_index, key) -> bool:
+        """Quadratically probes the hashmap for the key."""
+        j = 1
+        index = (initial_index + j ** 2) % self.capacity
+        while self.buckets.get_at_index(index) is not None:
+            if self.buckets.get_at_index(index).key == key:
+                return True
+            j += 1
+            index = (initial_index + j ** 2) % self.capacity
+        return False
 
     def empty_buckets(self) -> int:
         """Returns the number of empty buckets in the hash table."""
@@ -163,16 +201,6 @@ class HashMap:
         TODO: Write this implementation
         """
         pass
-
-    def quadratic_probe(self, initial_index) -> int:
-        """Quadratically probes the Dynamic Array as a helper method."""
-        j = 1
-        index = (initial_index + j ** 2) % self.capacity
-        while self.buckets.get_at_index(index) is not None:
-            j += 1
-            index = (initial_index + j ** 2) % self.capacity
-        return index
-
 
 
 if __name__ == "__main__":
@@ -249,16 +277,16 @@ if __name__ == "__main__":
     #     m.put('str' + str(i), i * 100)
     #     if i % 25 == 24:
     #         print(m.empty_buckets(), m.table_load(), m.size, m.capacity)
-
-    print("\nPDF - put example 2")
-    print("-------------------")
-    m = HashMap(40, hash_function_2)
-    for i in range(50):
-        m.put('str' + str(i // 3), i * 100)
-        if i % 10 == 9:
-            print(m.empty_buckets(), m.table_load(), m.size, m.capacity)
     #
-    # print("\nPDF - contains_key example 1")
+    # print("\nPDF - put example 2")
+    # print("-------------------")
+    # m = HashMap(40, hash_function_2)
+    # for i in range(50):
+    #     m.put('str' + str(i // 3), i * 100)
+    #     if i % 10 == 9:
+    #         print(m.empty_buckets(), m.table_load(), m.size, m.capacity)
+    #
+    # print("\nPDF - contains_key example 1")  # will work after remove is implemented
     # print("----------------------------")
     # m = HashMap(10, hash_function_1)
     # print(m.contains_key('key1'))
@@ -271,7 +299,7 @@ if __name__ == "__main__":
     # print(m.contains_key('key3'))
     # m.remove('key3')
     # print(m.contains_key('key3'))
-    #
+    # #
     # print("\nPDF - contains_key example 2")
     # print("----------------------------")
     # m = HashMap(75, hash_function_2)
@@ -287,22 +315,22 @@ if __name__ == "__main__":
     #     result &= not m.contains_key(str(key + 1))
     # print(result)
     #
-    # print("\nPDF - get example 1")
-    # print("-------------------")
-    # m = HashMap(30, hash_function_1)
-    # print(m.get('key'))
-    # m.put('key1', 10)
-    # print(m.get('key1'))
-    #
-    # print("\nPDF - get example 2")
-    # print("-------------------")
-    # m = HashMap(150, hash_function_2)
-    # for i in range(200, 300, 7):
-    #     m.put(str(i), i * 10)
-    # print(m.size, m.capacity)
-    # for i in range(200, 300, 21):
-    #     print(i, m.get(str(i)), m.get(str(i)) == i * 10)
-    #     print(i + 1, m.get(str(i + 1)), m.get(str(i + 1)) == (i + 1) * 10)
+    print("\nPDF - get example 1")
+    print("-------------------")
+    m = HashMap(30, hash_function_1)
+    print(m.get('key'))
+    m.put('key1', 10)
+    print(m.get('key1'))
+
+    print("\nPDF - get example 2")
+    print("-------------------")
+    m = HashMap(150, hash_function_2)
+    for i in range(200, 300, 7):
+        m.put(str(i), i * 10)
+    print(m.size, m.capacity)
+    for i in range(200, 300, 21):
+        print(i, m.get(str(i)), m.get(str(i)) == i * 10)
+        print(i + 1, m.get(str(i + 1)), m.get(str(i + 1)) == (i + 1) * 10)
     #
     # print("\nPDF - remove example 1")
     # print("----------------------")
